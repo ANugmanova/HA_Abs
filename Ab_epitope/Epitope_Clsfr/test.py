@@ -27,11 +27,10 @@ if __name__ == '__main__':
     parser.add_argument("-hd", "--hidden_dim", default=768, type=int)
     parser.add_argument("-dp", "--dataset_path", default='result/', type=str)
     parser.add_argument("-ckp", "--checkpoint_path", default='checkpoint/', type=str) 
-    parser.add_argument("-ckn","--checkpoint_name", default='mBLM.ckpt', type=str)
+    parser.add_argument("-ckn", "--checkpoint_name", default='mBLM.ckpt', type=str)
     parser.add_argument("-n", "--name", default='mBLM_attention', type=str)
     parser.add_argument("-o", "--output_path", default='result/', type=str)
     args = parser.parse_args()
-
 
     # dataloader
     if  args.language_model == 'onehot':
@@ -40,6 +39,8 @@ if __name__ == '__main__':
         train_loader, val_loader, test_loader = get_dataset(args.dataset_path, batch_size=args.batch_size,LM='mBLM')
     elif  args.language_model == 'esm2_t33_650M_UR50D':
         train_loader, val_loader, test_loader = get_dataset(args.dataset_path, batch_size=args.batch_size,LM='esm2_t33_650M')
+    elif  args.language_model == 'esm2_t6_8M_UR50D':
+        train_loader, val_loader, test_loader = get_dataset(args.dataset_path, batch_size=args.batch_size,LM='esm2_t6_8M')
     else:
         train_loader, val_loader, test_loader = get_dataset(args.dataset_path, batch_size=args.batch_size)
     trainer = pl.Trainer()

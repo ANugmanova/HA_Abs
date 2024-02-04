@@ -90,10 +90,15 @@ def load_npz(npz_path):
                 ID = npz_dict['id'].item(),
                 y=torch.IntTensor([y]))
     return data
-def load_esm_embedding(path):
 
-    esm_embedding = torch.load(path)['representations'][33]
+def load_esm_embedding(path):
+    try:
+        esm_embedding = torch.load(path)['representations'][33]
+    except:
+        esm_embedding = torch.load(path)
+
     return esm_embedding
+
 def load_mBLM_embedding(path):
 
     mBLM_embedding = torch.load(path)
@@ -131,9 +136,12 @@ class EpitopeDataset(Dataset):
         seq = row['VH_AA']
         target_data = row['Antigen_epitopes']
         # Convert your input and target data into PyTorch tensors
-        if 'esm2' in self.embed_path:
+        if 'esm2_t33_650M' in self.embed_path:
             esm_embedded_tensor = self.load_esm_embedding(f'{self.embed_path}{name}.pt')
             x=zero_padding(esm_embedded_tensor,max_h=150,max_w=1280)
+        elif 'esm2_t6_8M' in self.embed_path:
+            esm_embedded_tensor = self.load_esm_embedding(f'{self.embed_path}{name}.pt')
+            x=zero_padding(esm_embedded_tensor,max_h=150,max_w=320)
         elif "mBLM" in self.embed_path:
             embedded_tensor = self.load_mBLM_embedding(f'{self.embed_path}{name}.pt')
             x=zero_padding(embedded_tensor,max_h=150,max_w=768)

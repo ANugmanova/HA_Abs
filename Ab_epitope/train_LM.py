@@ -1,4 +1,4 @@
-from transformers import RobertaConfig, RobertaForMaskedLM
+from transformers import RobertaConfig, RobertaForMaskedLM, AutoModelForMaskedLM
 from transformers import AutoTokenizer,Trainer,  TrainingArguments, DataCollatorForLanguageModeling
 from torch.utils.data import Dataset
 from transformers import PreTrainedTokenizer
@@ -9,9 +9,8 @@ import os
 import pandas as pd
 import argparse
 
+
 class LineByLineTextDataset(Dataset):
-
-
     def __init__(self, tokenizer: PreTrainedTokenizer, file_path: str, block_size: int):
         
         if os.path.isfile(file_path) is False:
@@ -29,7 +28,8 @@ class LineByLineTextDataset(Dataset):
 
     def __getitem__(self, i) -> Dict[str, torch.tensor]:
         return self.examples[i]
-    
+
+
 def prepare_dataset(train_data,val_data,lm_data_dir):
     # load dataset
     if train_data.split('.')[-1] == 'tsv':
@@ -57,6 +57,7 @@ def prepare_dataset(train_data,val_data,lm_data_dir):
             
     return os.path.join(lm_data_dir,'LM_train.txt'), os.path.join(lm_data_dir,'LM_val.txt')
 
+
 def mBLM(vocab_size,max_position_embeddings,num_attention_heads,num_hidden_layers):
     
     config = RobertaConfig(
@@ -66,13 +67,12 @@ def mBLM(vocab_size,max_position_embeddings,num_attention_heads,num_hidden_layer
         num_hidden_layers=num_hidden_layers,
         type_vocab_size=1,
     )
-
-
     model = RobertaForMaskedLM(config=config)
     
     return model
 
-def train_mBLM(tokenizer,train_dir,val_dir,epoch,per_gpu_train_batch_size,output_dir):
+
+def train(tokenizer,train_dir,val_dir,epoch,per_gpu_train_batch_size,output_dir):
     train_dataset = LineByLineTextDataset(
         tokenizer=tokenizer,
         file_path=train_dir,
@@ -112,11 +112,17 @@ def train_mBLM(tokenizer,train_dir,val_dir,epoch,per_gpu_train_batch_size,output
     # save model
     trainer.save_model(args.model_location)
     
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Train custom antibody language model")
     parser.add_argument(
+        "--model_type",
+        default='./ESM',
+        type=str,
+        help="model dir to save ",)
+    parser.add_argument(
         "--model_location",
-        default='./mBLM',
+        default='./ESM',
         type=str,
         help="model dir to save ",)
     parser.add_argument(
@@ -177,18 +183,25 @@ if __name__ == "__main__":
 
     # load dataset
     train_dir, val_dir = prepare_dataset(args.train_data,args.val_data,args.lm_data_dir)
-    
+
     # define model
-    model = mBLM(vocab_size=args.vocab_size,
-                 max_position_embeddings=args.max_position_embeddings,
-                 num_attention_heads=args.num_attention_heads,
-                 num_hidden_layers=args.num_hidden_layers)
+    if args.model_type == 'mBLM':
+        model = mBLM(vocab_size=args.vocab_size,
+                     max_position_embeddings=args.max_position_embeddings,
+                     num_attention_heads=args.num_attention_heads,
+                     num_hidden_layers=args.num_hidden_layers)
+    else:
+        model = AutoModelForMaskedLM.from_pretrained("facebook/esm2_t6_8M_UR50D")
+
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    model = model.to(device)
+
     # train model
-    train_mBLM(tokenizer=tokenizer,
+    train(tokenizer=tokenizer,
                train_dir=train_dir,
                val_dir=val_dir,
                epoch=args.epoch,
                per_gpu_train_batch_size=args.batch_size,
                output_dir=args.model_location)
-    
+
 

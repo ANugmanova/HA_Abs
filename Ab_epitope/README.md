@@ -58,10 +58,10 @@ python train_LM.py
 ## Epitope prediction
 we then fine-tuned mBLM for multi-epitopes prediction.
 
-### extract mBLM embedding features
+### extract embedding features
 
 ```commandline
-python extract_mBLM_feature.py --model_location mBLM --fasta_file result/epitope_info_clstr_v2.fasta --output_dir result/mBLM_embedding
+python extract_mBLM_feature.py --model_location ESM/checkpoint-20000 --fasta_file result/epitope_clean.fasta --output_dir result/esm2_t6_8M_embedding
 ```
 ### benchmarking
 ```commandline

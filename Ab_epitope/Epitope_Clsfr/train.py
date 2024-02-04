@@ -24,6 +24,8 @@ def train_Epitope_Clsfr(model_name,batch_size,classes,lm_model_name,lr,dataset_p
         train_loader, test_loader, val_loader = get_dataset(dataset_path, batch_size=batch_size,LM='mBLM')
     elif  lm_model_name == 'esm2_t33_650M_UR50D':
         train_loader, val_loader, test_loader = get_dataset(dataset_path, batch_size=batch_size,LM='esm2_t33_650M')
+    elif  lm_model_name == 'esm2_t6_8M_UR50D':
+        train_loader, val_loader, test_loader = get_dataset(dataset_path, batch_size=batch_size,LM='esm2_t6_8M')
     else:
         train_loader, val_loader, test_loader = get_dataset(dataset_path, batch_size=batch_size)
     pl.seed_everything(42)

@@ -30,6 +30,9 @@ class Epitope_Clsfr(pl.LightningModule):
         if lm_model_name == "esm2_t33_650M_UR50D":
             self.seq_dim = 1280
             seq_dim = 1280
+        elif lm_model_name == "esm2_t6_8M_UR50D":
+            self.seq_dim = 320
+            seq_dim = 320
         elif lm_model_name == "mBLM":
             self.seq_dim = 768
             seq_dim = 768
@@ -143,6 +146,9 @@ class Epitope_Clsfr_no_attention(pl.LightningModule):
         if lm_model_name == "esm2_t33_650M_UR50D":
             self.seq_dim = 1280
             seq_dim = 1280
+        elif lm_model_name == "esm2_t6_8M_UR50D":
+            self.seq_dim = 320
+            seq_dim = 320
         elif lm_model_name == "mBLM":
             self.seq_dim = 768
             seq_dim = 768
