@@ -31,12 +31,18 @@ conda env create -f environment.yml
 
 ### dataset for memory-B-cells Language Model
 We downloaded and processed all OAS memory paired B cell seuqences from OAS.
+
+```commandline
+./bulk_download.sh
+```
+
 Then, heavy chain was clustered by 95% sequence identity using [cdhit](https://github.com/weizhongli/cdhit). Sequence representative was chosen from each cluster.
 For training and test purpose, the dataset was splitted by different sequence identity (50%, 60%, 70%, 80%, 90%).
 
 ```commandline
 ./data_clean_for_LM.sh
 ```
+
 ### dataset for antibody epitope prediction
 Note: for epitope prediction, heavy chain sequence was used only. 
 Firstly, we remove "unknown" sequence that is similar to annotated sequence (sequence identity 0.9), and then define "unknown" as "Others".
@@ -61,7 +67,7 @@ we then fine-tuned mBLM for multi-epitopes prediction.
 ### extract embedding features
 
 ```commandline
-python extract_mBLM_feature.py --model_location ESM/checkpoint-20000 --fasta_file result/epitope_clean.fasta --output_dir result/esm2_t6_8M_embedding
+python extract_mBLM_feature.py --model_location ESM/checkpoint-20000 --fasta_file data/epitope_all.fasta --output_dir result/esm2_t6_8M_embedding
 ```
 ### benchmarking
 ```commandline

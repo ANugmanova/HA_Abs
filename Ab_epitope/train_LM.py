@@ -111,6 +111,7 @@ def train(tokenizer,train_dir,val_dir,epoch,per_gpu_train_batch_size,output_dir)
     print(f"Evaluation perplexity: {math.exp(eval_results['eval_loss']):.2f}")
     # save model
     trainer.save_model(args.model_location)
+    tokenizer.save_pretrained(args.model_location)
     
 
 if __name__ == "__main__":
