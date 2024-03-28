@@ -6,14 +6,14 @@ total_iterations=1
 
 
 for ((i=1; i<=$total_iterations; i++)); do
-#    python script/split_dataset.py
-#    cp result/epitope_train.tsv dataset_esm/epitope_train_$i.tsv
-#    cp result/epitope_test.tsv dataset_esm/epitope_test_$i.tsv
-#    cp result/epitope_val.tsv dataset_esm/epitope_val_$i.tsv
-#    python script/rm_fas_repeats.py result/epitope_clean.fasta result/epitope_clean_v2.fasta
+    python script/split_dataset.py
+    cp result/epitope_train.tsv dataset_esm/epitope_train_$i.tsv
+    cp result/epitope_test.tsv dataset_esm/epitope_test_$i.tsv
+    cp result/epitope_val.tsv dataset_esm/epitope_val_$i.tsv
+    python script/rm_fas_repeats.py result/epitope_clean.fasta result/epitope_clean_v2.fasta
 
     python ./Epitope_Clsfr/train.py -n esm2_attention -lm esm2_t6_8M_UR50D -hd 320 -ckn esm2-$i
-#    python ./Epitope_Clsfr/test.py -n esm2_attention -lm esm2_t6_8M_UR50D -hd 320 -ckn epoch=29_esm2-$i.ckpt
+    python ./Epitope_Clsfr/test.py -n esm2_attention -lm esm2_t6_8M_UR50D -hd 320 -ckn epoch=29_esm2-$i.ckpt
 #    python ./Epitope_Clsfr/predict.py -dp result/Flu_unknown.csv-n esm2_attention -lm esm2_t6_8M_UR50D -hd 320 -ckn epoch=29_esm2-$i.ckpt
 #    python ./Epitope_Clsfr/explain.py -n esm2_attention -lm esm2_t6_8M_UR50D -hd 320 -ckn epoch=29_esm2-$i.ckpt -o dataset_esm/explain_esm2_$i/
 #    cp result/esm2_attention_confusion_matrix.png dataset_esm/esm2_attention_confusion_matrix_$i.png
