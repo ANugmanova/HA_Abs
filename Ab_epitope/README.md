@@ -75,14 +75,22 @@ python ./Epitope_Clsfr/train.py -n onehot_baseline -lm onehot -hd 26
 python ./Epitope_Clsfr/train.py -n esm2_attention -lm esm2_t33_650M_UR50D -hd 1280
 python ./Epitope_Clsfr/train.py -n mBLM_attention -lm mBLM -hd 768
 ```
-### model test and predict
+### model test
 ```commandline
 python ./Epitope_Clsfr/test.py -n mBLM_attention -lm mBLM -hd 768 -ckn mBLM.ckpt
-
-python ./Epitope_Clsfr/predict.py -dp result/Flu_unknown.csv -n mBLM_attention -lm mBLM -hd 768 -ckn mBLM.ckpt
-
-python ./Epitope_Clsfr/predict.py -dp result/Sarah_stem_antibodies.xlsx -n mBLM_attention -lm mBLM -hd 768 -ckn mBLM.ckpt
 ```
+
+### predict
+
+Use the bash script for prediction
+
+```commandline
+./predict.sh
+```
+
+The test data should be like [fasta file](https://github.com/ANugmanova/HA_Abs/tree/main/Ab_epitope/data/test.fasta) and [csv file](https://github.com/ANugmanova/HA_Abs/tree/main/Ab_epitope/result/epitope_test.tsv)
+ and be added to the appropriate TEST_FASTA and TEST_CSV variables.
+
 
 ## Antibody binding sites identification
 In order to investigate how model make a accurate prediction, Grad-CAM [https://arxiv.org/abs/1610.02391](https://arxiv.org/abs/1610.02391) technique was used to show model capturing binding sites in a residues level.

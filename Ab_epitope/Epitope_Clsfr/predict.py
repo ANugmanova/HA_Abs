@@ -6,8 +6,6 @@ import os
 import argparse
 from model import Epitope_Clsfr
 from utils import get_dataset, get_dataset_from_df
-import seaborn as sns
-import matplotlib.pyplot as plt
 from sklearn.metrics import confusion_matrix, multilabel_confusion_matrix
 from tqdm import tqdm
 # Usage
@@ -24,26 +22,37 @@ if __name__ == '__main__':
     parser.add_argument("-hd", "--hidden_dim", default=768, type=int)
     parser.add_argument("-dp", "--dataframe_path", default='result/Flu_unknown.csv', type=str)
     parser.add_argument("-ckp", "--checkpoint_path", default='checkpoint/', type=str)
-    parser.add_argument("-ckn","--checkpoint_name", default='mBLM.ckpt', type=str)
+    parser.add_argument("-ckn", "--checkpoint_name", default='mBLM.ckpt', type=str)
     parser.add_argument("-n", "--name", default='mBLM_attention', type=str)
     parser.add_argument("-o", "--output_path", default='result/', type=str)
+
     args = parser.parse_args()
 
-    test_loader = get_dataset_from_df(args.dataframe_path, batch_size=args.batch_size)
+    if  args.language_model == 'mBLM':
+        test_loader = get_dataset_from_df(args.output_path, args.dataframe_path, batch_size=args.batch_size, LM='mBLM')
+    elif  args.language_model == 'esm2_t33_650M_UR50D':
+        test_loader = get_dataset_from_df(args.output_path, args.dataframe_path, batch_size=args.batch_size, LM='esm2_t33_650M')
+    elif  args.language_model == 'esm2_t6_8M_UR50D':
+        test_loader = get_dataset_from_df(args.output_path, args.dataframe_path, batch_size=args.batch_size, LM='esm2_t6_8M')
+    else:
+        test_loader = get_dataset_from_df(args.output_path, args.dataframe_path, batch_size=args.batch_size)
+
     filename = args.dataframe_path.split('/')[-1].split('.')[0]
     pretrained_filename = os.path.join(args.checkpoint_path+args.name+'/', args.checkpoint_name)
     if os.path.isfile(pretrained_filename):
         print("Found pretrained model, loading...")
-        model = Epitope_Clsfr.load_from_checkpoint(pretrained_filename,classes=args.classes,hidden_dim=args.hidden_dim,layers=args.layers,class_weights=None,lm_model_name = args.language_model)
+        model = Epitope_Clsfr.load_from_checkpoint(pretrained_filename,classes=args.classes,
+                                                   hidden_dim=args.hidden_dim,layers=args.layers,class_weights=None,
+                                                   lm_model_name = args.language_model)
         # model.eval()
         # test on test set
         predicted_labels_ls = []
         predicted_probabilities = []
 
         with torch.no_grad():
-            for batch in tqdm(test_loader,desc="mBLM prediction", leave=False):
+            for batch in tqdm(test_loader,desc="model prediction", leave=False):
                 # get the inputs and labels
-                inputs, _ = batch
+                inputs, labels, _ = batch
 
                 outputs = model(inputs)
                 # get model prediction probabilities
@@ -69,7 +78,9 @@ if __name__ == '__main__':
             print(f"Error: unsupported file type for {args.dataframe_pat}")
         # add the predicted class and probability to the DataFrame
 
-        df['predicted_class'] = predicted_all
+        classes = ["HA:Head", "HA:Stem","HIV", "S:NTD", "S:RBD", "S:S2", "Others"]
+
+        df['predicted_class'] = [classes[pred] for pred in predicted_all]
         df['predicted_probability'] = probabilities_all[np.arange(len(predicted_all)), predicted_all]
-        df.to_csv(f'{args.output_path}{filename}_prediction.tsv',sep='\t')
+        df.to_csv(f'{args.output_path}/{filename}_prediction.tsv',sep='\t')
 
