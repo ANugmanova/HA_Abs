@@ -174,28 +174,17 @@ def get_dataset_from_df(embedding_path, df_file, batch_size, LM='mBLM',ncpu=16):
         df = pd.read_excel(df_file)
     else:
         print('ERROR: the format of dataframe is not defined')
-        
-    # filename = os.path.basename(df_path).split('.')[0]
-    # first, the get the fasta file and remove the depulicates
-    # fas_f = f'result/{filename}.fasta'
-    # if not os.path.exists(fas_f):
-    #     print('start generating fasta file')
-    #     df2fasta(df,fas_f)
-    #     # remove duplicate sequence from fasta
-    #     subprocess.run(['python', 'script/rm_fas_repeats.py', fas_f, fas_f])
-    # run esm embedding
-    # embedding_output_path = f'result/{filename}_mBLM_embedding/'
 
-    os.makedirs(embedding_output_path, exist_ok=True)
-    # if len(os.listdir(embedding_output_path)) < 1:
-    #     print('start embedding seqeuence...')
-    #     subprocess.run(['python', 'extract_mBLM_feature.py',  '--model_location','mBLM','--fasta_file',fas_f,'--output_dir', embedding_output_path])
     if LM:
-        test_loader = DataLoader(EpitopeDataset(df,f'{path}{LM}_embedding/',prediction=True),batch_size=batch_size,shuffle=False,num_workers=ncpu, pin_memory=True)
+        test_loader = DataLoader(EpitopeDataset(df, f'{embedding_path}/{LM}_embedding/', prediction=True),
+                                 batch_size=batch_size, shuffle=False, num_workers=ncpu, pin_memory=True)
     else:
-        test_loader = DataLoader(EpitopeDataset(df,'none',prediction=True),batch_size=batch_size,shuffle=False,num_workers=ncpu, pin_memory=True)
+        test_loader = DataLoader(EpitopeDataset(df, 'none', prediction=True),
+                                 batch_size=batch_size, shuffle=False, num_workers=ncpu, pin_memory=True)
     return test_loader
-def get_dataset(path, batch_size,LM='esm2_t33_650M', ncpu=16):
+
+
+def get_dataset(path, batch_size, LM='esm2_t33_650M', ncpu=16):
     test_df = pd.read_csv(f'{path}epitope_test.tsv', sep='\t')
     train_df = pd.read_csv(f'{path}epitope_train.tsv', sep='\t')
     val_df = pd.read_csv(f'{path}epitope_val.tsv', sep='\t')
