@@ -118,12 +118,12 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Train custom antibody language model")
     parser.add_argument(
         "--model_type",
-        default='./ESM',
+        default='mBLM',
         type=str,
         help="model dir to save ",)
     parser.add_argument(
         "--model_location",
-        default='./ESM',
+        default='./mBLM',
         type=str,
         help="model dir to save ",)
     parser.add_argument(
